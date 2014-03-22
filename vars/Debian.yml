@@ -1,0 +1,10 @@
+---
+
+nfs_packages:
+  - nfs-kernel-server
+
+nfs_services:
+  - nfs-kernel-server
+
+nfs_default_owner: nobody
+nfs_default_group: nogroup

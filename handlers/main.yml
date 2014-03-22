@@ -1,0 +1,4 @@
+---
+
+- name: refresh exports
+  command: exportfs -ra

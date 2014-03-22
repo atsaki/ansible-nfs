@@ -1,0 +1,11 @@
+---
+
+nfs_packages:
+  - nfs-utils
+
+nfs_services:
+  - rpcbind
+  - nfs
+
+nfs_default_owner: nfsnobody
+nfs_default_group: nfsnobody
