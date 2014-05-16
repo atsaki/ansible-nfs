@@ -13,10 +13,6 @@
   with_items: nfs_packages
   when: ansible_os_family == "Debian"
 
-- name: Ensure NFS service started and enabled
-  service: name="{{ item }}" state=started enabled=yes
-  with_items: nfs_services
-
 - name: Ensure exported directory exists
   file: path="{{ item.path }}" state=directory
         owner='{{ item.owner|default(nfs_default_owner) }}'
@@ -30,3 +26,7 @@
               line='{{ item.path }} {% for host in item.hosts %} {{ host.name }}({{ host.options|default([])|join(",") }}){% endfor %}'
   with_items: nfs_exported_directories
   notify: refresh exports
+
+- name: Ensure NFS service started and enabled
+  service: name="{{ item }}" state=started enabled=yes
+  with_items: nfs_services
