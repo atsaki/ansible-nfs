@@ -9,3 +9,5 @@ nfs_services:
 
 nfs_default_owner: nfsnobody
 nfs_default_group: nfsnobody
+
+nfs_config_file: /etc/sysconfig/nfs

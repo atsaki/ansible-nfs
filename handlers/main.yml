@@ -2,3 +2,7 @@
 
 - name: refresh exports
   command: exportfs -ra
+
+- name: restart nfs services
+  service: name="{{ item }}" state=restarted
+  with_items: nfs_services
