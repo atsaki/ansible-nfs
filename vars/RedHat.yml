@@ -5,7 +5,7 @@ nfs_packages:
 
 nfs_services:
   - rpcbind
-  - nfs
+  - nfs-server
 
 nfs_default_owner: nfsnobody
 nfs_default_group: nfsnobody
