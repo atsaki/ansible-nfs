@@ -13,16 +13,12 @@
   with_items: nfs_packages
   when: ansible_os_family == "Debian"
 
-- name: Ensure NFS service started and enabled
-  service: name="{{ item }}" state=started enabled=yes
-  with_items: nfs_services
-
 - name: Setup Ports
   lineinfile: dest="{{ nfs_config_file }}"
               regexp="^#?{{ item.name }}"
               line='{{ item.name }}={{ item.value }}'
   with_items: nfs_ports
-  notify: restart nfs services
+  register: ports
 
 - name: Ensure exported directory exists
   file: path="{{ item.path }}" state=directory
@@ -32,8 +28,20 @@
   with_items: nfs_exported_directories
 
 - name: Ensure exported directories are in /etc/exports
-  lineinfile: dest=/etc/exports
-              regexp="^{{ item.path }}\s"
-              line='{{ item.path }} {% for host in item.hosts %} {{ host.name }}({{ host.options|default([])|join(",") }}){% endfor %}'
-  with_items: nfs_exported_directories
-  notify: refresh exports
+  template: dest=/etc/exports
+            src=exports.j2
+  register: exports
+
+- name: Disable NFS service if no exports are available
+  service: name="{{ item }}"
+           state=stopped
+           enabled=no
+  with_items: nfs_services
+  when: exports.changed and not nfs_exported_directories
+
+- name: Ensure NFS service started and enabled
+  service: name="{{ item }}"
+           state=restarted
+           enabled=yes
+  with_items: nfs_services
+  when: (exports.changed or ports.changed) and nfs_exported_directories

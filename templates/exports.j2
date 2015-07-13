@@ -1,0 +1,4 @@
+{% for item in nfs_exported_directories %}
+{{ item.path }} {% for host in item.hosts %} {{ host.name }}({{ host.options|default([])|join(",") }}){% endfor %}
+
+{% endfor %}
