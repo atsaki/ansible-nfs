@@ -1,0 +1,15 @@
+machine:
+  ruby:
+    version: 2.0.0-p481
+  environment:
+    KITCHEN_DRIVER: digitalocean
+
+dependencies:
+  override:
+    - bundle check || bundle install --jobs=4 --retry=3
+
+test:
+  post:
+    - bundle exec kitchen test --destroy=always --concurrency=4:
+        timeout: 1200
+

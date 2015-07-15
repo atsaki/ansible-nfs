@@ -1,0 +1,87 @@
+---
+
+<% if ENV['KITCHEN_DRIVER'] == 'digitalocean' %>
+driver:
+  name: digitalocean
+
+platforms:
+  - name: ubuntu1204
+    driver_config:
+      server_name: test-kitchen-ubuntu1204
+      image: ubuntu-12-04-x64
+      region: <%= ENV['DIGITALOCEAN_REGION'] || 'sgp1' %>
+      size: <%= ENV['DIGITALOCEAN_SIZE'] || '512mb' %>
+  - name: ubuntu1410
+    driver_config:
+      server_name: test-kitchen-ubuntu1410
+      image: ubuntu-14-10-x64
+      region: <%= ENV['DIGITALOCEAN_REGION'] || 'sgp1' %>
+      size: <%= ENV['DIGITALOCEAN_SIZE'] || '512mb' %>
+  - name: ubuntu1504
+    driver_config:
+      server_name: test-kitchen-ubuntu1504
+      image: ubuntu-15-04-x64
+      region: <%= ENV['DIGITALOCEAN_REGION'] || 'sgp1' %>
+      size: <%= ENV['DIGITALOCEAN_SIZE'] || '512mb' %>
+  - name: centos65
+    driver_config:
+      server_name: test-kitchen-centos65
+      image: centos-6-5-x64
+      region: <%= ENV['DIGITALOCEAN_REGION'] || 'sgp1' %>
+      size: <%= ENV['DIGITALOCEAN_SIZE'] || '512mb' %>
+  - name: centos70
+    driver_config:
+      server_name: test-kitchen-centos70
+      image: centos-7-0-x64
+      region: <%= ENV['DIGITALOCEAN_REGION'] || 'sgp1' %>
+      size: <%= ENV['DIGITALOCEAN_SIZE'] || '512mb' %>
+  - name: fedora22
+    driver_config:
+      server_name: test-kitchen-fedora22
+      image: fedora-22-x64
+      region: <%= ENV['DIGITALOCEAN_REGION'] || 'sgp1' %>
+      size: <%= ENV['DIGITALOCEAN_SIZE'] || '512mb' %>
+ <% else %>
+driver:
+  name: vagrant
+
+platforms:
+  - name: ubuntu1204
+    driver_config:
+      box: boxcutter/ubuntu1204
+  - name: ubuntu1404
+    driver_config:
+      box: boxcutter/ubuntu1404
+  - name: ubuntu1410
+    driver_config:
+      box: boxcutter/ubuntu1410
+  - name: ubuntu1504
+    driver_config:
+      box: boxcutter/ubuntu1504
+  - name: centos66
+    driver_config:
+      box: boxcutter/centos66
+  - name: centos71
+    driver_config:
+      box: boxcutter/centos71
+  - name: fedora21
+    driver_config:
+      box: boxcutter/fedora21
+  - name: fedora22
+    driver_config:
+      box: boxcutter/fedora22
+<% end %>
+
+provisioner:
+  name: ansible_push
+  playbook: test/integration/default.yml
+  ansible_config: test/integration/ansible.cfg
+  verbose: vvvv
+  sudo: true
+
+verifier:
+  name: shell
+  command: bundle exec sh -c "cd test/integration/default/shell && rake"
+
+suites:
+  - name: default

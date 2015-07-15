@@ -1,0 +1,14 @@
+---
+
+- name: wrapper playbook for kitchen testing
+  hosts: all
+  roles:
+    - role: ansible-nfs
+      nfs_exported_directories:
+        - path: /export/test1
+          hosts:
+            - {name: 192.168.0.0/16, options: ["ro", "sync"]}
+            - {name: 10.0.0.5, options: ["rw", "sync", "no_root_squash"]}
+        - path: /export/test2
+          hosts:
+            - {name: "*", options: []}

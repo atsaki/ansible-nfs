@@ -1,0 +1,4 @@
+# This file is added to workaround the error missing rake dependency
+# https://github.com/test-kitchen/busser-serverspec/issues/28
+source 'https://rubygems.org'
+gem 'rake'
