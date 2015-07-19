@@ -3,10 +3,18 @@
 - name: Include OS specific variables
   include_vars: "{{ ansible_os_family }}.yml"
 
+- name: Install libselinux-python when ansible_os_family is RedHat
+  yum: name="libselinux-python" state=installed
+  when: ansible_os_family == "RedHat"
+
 - name: Install nfs-utils when ansible_os_family is RedHat
   yum: name="{{ item }}" state=installed
   with_items: nfs_packages
   when: ansible_os_family == "RedHat"
+
+- name: apt-get update when ansible_os_family is Debian
+  apt: update_cache=yes
+  when: ansible_os_family == "Debian"
 
 - name: Install nfs-kernel-server when ansible_os_family is Debian
   apt: name="{{ item }}" state=installed
