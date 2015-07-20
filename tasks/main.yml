@@ -1,7 +1,28 @@
 ---
 
-- name: Include OS specific variables
+- name: Include Ubuntu15 or later specific variables
+  include_vars: "Ubuntu15.yml"
+  when: >
+    nfs_packages is not defined and
+    ansible_distribution == "Ubuntu" and
+    ansible_distribution_major_version|int >= 15
+
+- name: Include Fedora21/RedHat7 or later specific variables
+  include_vars: "RedHat7.yml"
+  when: >
+    nfs_packages is not defined and
+    ansible_os_family == "RedHat" and
+    ((ansible_distribution == "Fedora" and ansible_distribution_major_version|int >= 21) or
+    (ansible_distribution != "Fedora" and ansible_distribution_major_version|int >= 7))
+
+- name: Include OS specific variables (RedHat/Debian)
   include_vars: "{{ ansible_os_family }}.yml"
+  when: nfs_packages is not defined
+
+- name: Install nfs-utils when Fedora22+
+  dnf: name="{{ item }}" state=installed
+  with_items: nfs_packages
+  when: ansible_distribution == "Fedora" and ansible_distribution_major_version|int >= 22
 
 - name: Install libselinux-python when ansible_os_family is RedHat
   yum: name="libselinux-python" state=installed
@@ -10,7 +31,10 @@
 - name: Install nfs-utils when ansible_os_family is RedHat
   yum: name="{{ item }}" state=installed
   with_items: nfs_packages
-  when: ansible_os_family == "RedHat"
+  when: >
+    ansible_os_family == "RedHat" and
+    not (ansible_distribution == "Fedora" and
+         ansible_distribution_major_version|int >= 22)
 
 - name: apt-get update when ansible_os_family is Debian
   apt: update_cache=yes
