@@ -2,6 +2,15 @@
 
 - name: wrapper playbook for kitchen testing
   hosts: all
+  gather_facts: no
+  pre_tasks:
+    - name: Ensure Python is installed
+      raw: "[ -f /usr/bin/python ]
+             || ! type apt-get >/dev/null 2>&1
+             || apt-get update && apt-get install -y python"
+      ignore_errors: yes
+    - name: Gather facts
+      setup:
   roles:
     - role: ansible-nfs
       nfs_exported_directories:

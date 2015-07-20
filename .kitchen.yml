@@ -58,6 +58,12 @@ platforms:
   - name: ubuntu1504
     driver_config:
       box: boxcutter/ubuntu1504
+  - name: debian78
+    driver_config:
+      box: boxcutter/debian78
+  - name: debian80
+    driver_config:
+      box: boxcutter/debian80
   - name: centos66
     driver_config:
       box: boxcutter/centos66
@@ -70,6 +76,10 @@ platforms:
   - name: fedora22
     driver_config:
       box: boxcutter/fedora22
+
+verifier:
+  name: shell
+  command: bundle exec sh -c "cd test && rake"
 <% end %>
 
 provisioner:
@@ -78,10 +88,7 @@ provisioner:
   ansible_config: test/integration/ansible.cfg
   verbose: vvvv
   sudo: true
-
-verifier:
-  name: shell
-  command: bundle exec sh -c "cd test/integration/default/shell && rake"
+  idempotency_test: true
 
 suites:
   - name: default
