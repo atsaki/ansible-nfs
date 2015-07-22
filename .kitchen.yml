@@ -1,5 +1,54 @@
 ---
 
+<%
+def digitalocean_platform(name, image)
+  <<-EOS
+  - name: #{name}
+    driver_config:
+      provider: digital_ocean
+      box: digital_ocean
+      box_url: https://github.com/smdahlen/vagrant-digitalocean/raw/master/box/digital_ocean.box
+      ssh_key: #{ENV['DIGITALOCEAN_SSH_PRIVATE_KEY'] || '~/.ssh/id_rsa'}
+      vagrantfile_erb: test/Vagrantfile.erb
+      customize:
+        token: #{ENV['DIGITALOCEAN_ACCESS_TOKEN']}
+        image: #{image}
+        region: #{ENV['DIGITALOCEAN_REGION'] || 'sgp1'}
+        size: #{ENV['DIGITALOCEAN_SIZE'] || '512mb'}
+        ssh_key_name: #{ENV['DIGITALOCEAN_SSH_KEY_NAME']}
+  EOS
+end
+%>
+
+<%
+def idcfcloud_platform(name, template_name, public_port)
+  <<-EOS
+  - name: #{name}
+    driver_config:
+      provider: cloudstack
+      box: dummy
+      box_url: https://github.com/schubergphilis/vagrant-cloudstack/raw/master/dummy.box
+      ssh_key: #{ENV['CLOUDSTACK_SSH_PRIVATE_KEY'] || '~/.ssh/id_rsa'}
+      vagrantfile_erb: test/Vagrantfile.erb
+      customize:
+        scheme: https
+        host: compute.jp-east.idcfcloud.com
+        path: /client/api
+        port: 443
+        api_key: #{ENV['CLOUDSTACK_API_KEY']}
+        secret_key: #{ENV['CLOUDSTACK_SECRET_KEY']}
+        zone_name: #{ENV['CLOUDSTACK_ZONE_NAME']}
+        service_offering_name: #{ENV['CLOUDSTACK_SERVICE_OFFERING_NAME'] || 'light.S1'}
+        template_name: #{template_name}
+        keypair: #{ENV['CLOUDSTACK_SSH_KEYPAIR']}
+        pf_open_firewall: true
+        pf_ip_address: #{ENV['CLOUDSTACK_PUBLIC_IP_ADDRESS']}
+        pf_public_port: #{public_port}
+        pf_private_port: 22
+  EOS
+end
+%>
+
 <% if ENV['KITCHEN_DRIVER'] == 'digitalocean' %>
 driver:
   name: digitalocean
@@ -76,6 +125,8 @@ platforms:
   - name: fedora22
     driver_config:
       box: boxcutter/fedora22
+<%= digitalocean_platform("digitalocean_ubuntu1204", "ubuntu-12-04-x64") %>
+<%= idcfcloud_platform("idcfcloud_cetos70", "CentOS 7.0 64-bit for Vagrant", 2022) %>
 
 verifier:
   name: shell
